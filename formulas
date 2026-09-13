@@ -1,0 +1,51 @@
+SHAPES
+  B  = batch          how many sentences
+  T  = seq_len        how many rows
+  D  = d_model        numbers per row
+  h  = D / num_heads  width per head
+  V  = vocab_size
+
+EMBEDDING                                       (B,T) → (B,T,D)
+  token_row = TokenTable[id]                    lookup, TokenTable is (V, D)
+  pos_row   = PosTable[position]                lookup, PosTable is (max_len, D)
+  x         = token_row + pos_row               elementwise add
+
+ATTENTION — one head                            (B,T,D) → (B,T,h)
+  Q = x @ Wq                                    Wq, Wk, Wv are (D, h)
+  K = x @ Wk
+  V = x @ Wv
+  S = Q @ Kᵀ / √h                               (B,T,T)  score all pairs
+  S = S.masked_fill(upper_triangle, -inf)       block the future
+  A = softmax(S, dim=-1)                        (B,T,T)  rows sum to 1
+  out = A @ V                                   (B,T,h)  blend
+
+  softmax(xᵢ) = e^xᵢ / Σⱼ e^xʲ
+
+MULTI-HEAD                                      (B,T,D) → (B,T,D)
+  h    = D / num_heads
+  outᵢ = Attention_i(x)                         each head, own Wq/Wk/Wv
+  out  = concat(out₀ … outₙ, dim=-1)
+
+FEED-FORWARD                                    (B,T,D) → (B,T,D)
+  h1  = x @ W1 + b1                             W1 is (D, 4D)
+  h2  = GELU(h1)                                per number, no shape change
+  out = h2 @ W2 + b2                            W2 is (4D, D)
+
+  GELU(x) = x · Φ(x)                            Φ = normal CDF, 0 to 1
+
+PRIMITIVES
+  Linear(in, out)      y = x @ W + b            W is (in, out), b is (out,)
+  Embedding(n, d)      y = Table[idx]           Table is (n, d), lookup only
+  matmul               (a,b) @ (b,c) → (a,c)    inner cancels
+
+NOT BUILT YET
+  LayerNorm(x) = (x − mean) / std · γ + β       per-row rescale
+  residual     x = x + sublayer(x)              add input back
+  logits       = x @ Wout                       (B,T,D) → (B,T,V)
+  loss         = cross_entropy(logits, targets)
+
+PIPELINE
+  ids           (B, T)
+  embedding     (B, T, D)
+  multi-head    (B, T, D)
+  feed-forward  (B, T, D)
