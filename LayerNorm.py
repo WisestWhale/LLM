@@ -6,8 +6,8 @@ class LayerNorm(nn.Module):
     def __init__(self, d_model):
         super().__init__()
         self.eps = 1e-5
-        self.gamma = nn.parameter(torch.ones(d_model))
-        self.beta   = nn.parameter(torch.zeroes(d_model))
+        self.gamma = nn.Parameter(torch.ones(d_model))
+        self.beta   = nn.Parameter(torch.zeros(d_model))
         
     def forward(self , x):
         mean = x.mean(dim = -1, keepdim = True)

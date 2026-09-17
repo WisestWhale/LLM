@@ -29,9 +29,4 @@ class Tokenizer:
         return " ".join(words)
 
 
-word = "the dog barks"
-tokenizer =Tokenizer(word)
-encoded = tokenizer.encode("the cat barks")
-print(f"Encoded IDs: {encoded}")
-decoded = tokenizer.decode(encoded)
-print(f"Decoded text: {decoded}")
+
