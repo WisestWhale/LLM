@@ -21,6 +21,8 @@ class GPT(nn.Module):
         
     def forward(self, ids):
         batch_size, seq_len = ids.shape
+        if seq_len == 0 or seq_len > self.pos_emb.num_embeddings:
+            raise ValueError("Sequence length must be between 1 and the model context length.")
 
         positions = torch.arange(seq_len, device=ids.device)
         x = self.token_emb(ids) + self.pos_emb(positions)
@@ -32,6 +34,7 @@ class GPT(nn.Module):
         return self.out_head(x)
     
     
-ids = torch.randint(0, 50, (1, 3))
-model = GPT(vocab_size=50, d_model=12, max_length=10, num_heads=3, num_blocks=2)
-print(model(ids).shape)
+if __name__ == "__main__":
+    ids = torch.randint(0, 50, (1, 3))
+    model = GPT(vocab_size=50, d_model=12, max_length=10, num_heads=3, num_blocks=2)
+    print(model(ids).shape)

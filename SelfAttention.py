@@ -28,6 +28,8 @@ class CasualAttention(nn.Module):
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_in, d_out, max_length, num_heads):
         super().__init__()
+        if num_heads < 1 or d_out < 1 or d_out % num_heads != 0:
+            raise ValueError("Output dimension must be positive and divisible by the number of heads.")
         head_dim = d_out // num_heads
         self.heads = nn.ModuleList([
             CasualAttention(d_in, head_dim, max_length)
@@ -38,6 +40,7 @@ class MultiHeadAttention(nn.Module):
         outputs = [head(x) for head in self.heads]
         return torch.cat(outputs, dim=-1)    
 
-x = torch.randn(1, 3, 12)
-mha  = MultiHeadAttention(12 , 15 , 10 , 3)
-print(mha(x))
+if __name__ == "__main__":
+    x = torch.randn(1, 3, 12)
+    mha = MultiHeadAttention(12, 15, 10, 3)
+    print(mha(x))
