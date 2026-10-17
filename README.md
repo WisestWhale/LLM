@@ -13,12 +13,12 @@ python -m pip install -r requirements.txt
 ## Generate text
 
 ```powershell
-python Generate.py --prompt "The morning" --tokens 50 --temperature 0.8 --top-k 20 --seed 42
+python Generate.py --prompt "The morning" --tokens 50 --temperature 0.8 --top-k 20 --top-p 0.9 --seed 42
 ```
 
 Generation loads `model.pt`; it does not train or download books. The checkpoint must match the original generation architecture: GPT-2 vocabulary (50,257 tokens), width 128, context 128, four heads and four blocks. The GPT-2 tokenizer downloads its vocabulary on first use, so the first run needs internet access. Only load trusted checkpoints.
 
-`--temperature` controls sampling randomness; `--top-k` limits each draw to the highest-scoring tokens. A fixed seed helps repeat a run on the same device and software stack. Output quality depends on training; this is a small experimental model, not a chat assistant.
+`--temperature` controls sampling randomness; `--top-k` limits each draw to the highest-scoring tokens. `--top-p` (nucleus sampling) keeps the smallest set of likely tokens whose combined probability reaches the chosen threshold, including the token that crosses it. It runs after top-k filtering; the default `1.0` disables this extra filter. A fixed seed helps repeat a run on the same device and software stack. Output quality depends on training; this is a small experimental model, not a chat assistant.
 
 ## Tests
 
@@ -26,7 +26,7 @@ Generation loads `model.pt`; it does not train or download books. The checkpoint
 python -B -m unittest test_model -v
 ```
 
-Five CPU-friendly tests check output shape, feed-forward gradients, causal masking, context limits, generation settings and prompt preservation. They use a tiny random model and do not download data or train the saved checkpoint.
+Seven CPU-friendly tests check output shape, feed-forward gradients, causal masking, context limits, generation settings, nucleus filtering and prompt preservation. They use a tiny random model and do not download data or train the saved checkpoint.
 
 ## Files
 
