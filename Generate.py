@@ -55,7 +55,10 @@ def main():
     parser.add_argument("--top-p", type=float, default=1.0,
                         help="Cumulative sampling probability (0 < p <= 1).")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--output", type=Path, help="Save generated text to a new UTF-8 file.")
     args = parser.parse_args()
+    if args.output is not None and args.output.exists():
+        parser.error(f"Output file already exists: {args.output}. Choose a new filename.")
     if not args.prompt.strip():
         parser.error("Prompt must not be empty.")
     if not args.checkpoint.is_file():
@@ -80,7 +83,14 @@ def main():
     tokenizer = tiktoken.get_encoding("gpt2")
     ids = torch.tensor([tokenizer.encode(args.prompt)], device=device)
     output = generate(model, ids, args.tokens, 128, args.temperature, args.top_k, args.top_p)
-    print(tokenizer.decode(output[0].tolist()))
+    text = tokenizer.decode(output[0].tolist())
+    print(text)
+    if args.output is not None:
+        try:
+            with args.output.open("x", encoding="utf-8") as output_file:
+                output_file.write(text + "\n")
+        except OSError as error:
+            parser.error(f"Could not save output: {error}")
 
 
 if __name__ == "__main__":

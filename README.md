@@ -20,6 +20,14 @@ Generation loads `model.pt`; it does not train or download books. The checkpoint
 
 `--temperature` controls sampling randomness; `--top-k` limits each draw to the highest-scoring tokens. `--top-p` (nucleus sampling) keeps the smallest set of likely tokens whose combined probability reaches the chosen threshold, including the token that crosses it. It runs after top-k filtering; the default `1.0` disables this extra filter. A fixed seed helps repeat a run on the same device and software stack. Output quality depends on training; this is a small experimental model, not a chat assistant.
 
+To save the generated text (including your prompt) to a file:
+
+```powershell
+python Generate.py --prompt "The morning" --tokens 50 --output story.txt
+```
+
+The text also appears in the terminal. Choose a new filename each time; existing files are not overwritten. The destination folder must already exist.
+
 ## Tests
 
 ```powershell
