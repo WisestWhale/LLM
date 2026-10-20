@@ -45,9 +45,21 @@ def generate(model, ids, max_new_tokens, max_length, temperature=1.0, top_k=None
         model.train(was_training)
 
 
+def read_prompt(prompt=None, prompt_file=None):
+    if prompt_file is not None:
+        text = prompt_file.read_text(encoding="utf-8-sig")
+    else:
+        text = "The" if prompt is None else prompt
+    if not text.strip():
+        raise ValueError("Prompt must not be empty.")
+    return text
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--prompt", default="The")
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--prompt", help="Starting text (default: The).")
+    source.add_argument("--prompt-file", type=Path, help="Read starting text from a UTF-8 file.")
     parser.add_argument("--checkpoint", type=Path, default=Path(__file__).with_name("model.pt"))
     parser.add_argument("--tokens", type=int, default=50)
     parser.add_argument("--temperature", type=float, default=1.0)
@@ -56,11 +68,15 @@ def main():
                         help="Cumulative sampling probability (0 < p <= 1).")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output", type=Path, help="Save generated text to a new UTF-8 file.")
+    parser.add_argument("--completion-only", action="store_true",
+                        help="Print and save only new text, without the prompt.")
     args = parser.parse_args()
     if args.output is not None and args.output.exists():
         parser.error(f"Output file already exists: {args.output}. Choose a new filename.")
-    if not args.prompt.strip():
-        parser.error("Prompt must not be empty.")
+    try:
+        prompt = read_prompt(args.prompt, args.prompt_file)
+    except (OSError, ValueError) as error:
+        parser.error(f"Could not read prompt: {error}")
     if not args.checkpoint.is_file():
         parser.error(f"Checkpoint not found: {args.checkpoint}")
     if args.tokens < 0 or args.temperature <= 0 or args.top_k < 1:
@@ -81,9 +97,10 @@ def main():
     except (RuntimeError, ValueError) as error:
         parser.error(f"Checkpoint does not match this model: {error}")
     tokenizer = tiktoken.get_encoding("gpt2")
-    ids = torch.tensor([tokenizer.encode(args.prompt)], device=device)
+    ids = torch.tensor([tokenizer.encode(prompt)], device=device)
     output = generate(model, ids, args.tokens, 128, args.temperature, args.top_k, args.top_p)
-    text = tokenizer.decode(output[0].tolist())
+    tokens = output[0, ids.shape[1]:] if args.completion_only else output[0]
+    text = tokenizer.decode(tokens.tolist())
     print(text)
     if args.output is not None:
         try:

@@ -28,13 +28,27 @@ python Generate.py --prompt "The morning" --tokens 50 --output story.txt
 
 The text also appears in the terminal. Choose a new filename each time; existing files are not overwritten. The destination folder must already exist.
 
+To continue text saved in a UTF-8 file:
+
+```powershell
+python Generate.py --prompt-file story.txt --tokens 50 --output continued.txt
+```
+
+Use either `--prompt` or `--prompt-file`. Files can contain multiple lines. Add `--completion-only` to print and save only the newly generated text:
+
+```powershell
+python Generate.py --prompt-file story.txt --completion-only --output new_text.txt
+```
+
+Without that flag, output still includes the starting text. Keep the output filename different from the input filename.
+
 ## Tests
 
 ```powershell
-python -B -m unittest test_model -v
+python -B -m unittest discover -p "test_*.py" -v
 ```
 
-Seven CPU-friendly tests check output shape, feed-forward gradients, causal masking, context limits, generation settings, nucleus filtering and prompt preservation. They use a tiny random model and do not download data or train the saved checkpoint.
+CPU-friendly model tests check output shape, feed-forward gradients, causal masking, context limits, generation settings, nucleus filtering and prompt preservation. They use a tiny random model and do not download data or train the saved checkpoint. CLI tests use mocked model output to check prompt files, errors and completion-only output.
 
 ## Files
 
