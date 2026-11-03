@@ -42,6 +42,16 @@ python Generate.py --prompt-file story.txt --completion-only --output new_text.t
 
 Without that flag, output still includes the starting text. Keep the output filename different from the input filename.
 
+## Evaluate a checkpoint
+
+Score how well `model.pt` predicts a text file:
+
+```powershell
+python Evaluate.py held_out.txt --max-windows 50
+```
+
+It prints the average next-token loss and perplexity (lower is better) over non-overlapping 128-token windows. The bundled books are training data, so use a different text for a fair number, and the same file and `--max-windows` when comparing two checkpoints. Without `--max-windows` the whole file is scored.
+
 ## Tests
 
 ```powershell
@@ -55,6 +65,7 @@ CPU-friendly model tests check output shape, feed-forward gradients, causal mask
 - `GPT.py`: model embeddings, transformer blocks and output projection.
 - `TransformerBlock.py`, `SelfAttention.py`, `FeedForward.py`, `LayerNorm.py`: model components.
 - `Generate.py`: checkpoint-based generation and command-line options.
+- `Evaluate.py`: loss and perplexity of a checkpoint on a text file.
 - `DataLoader.py`, `SlidingWindow.py`: text loading and next-token training windows.
 - `Training.py`: trains the model on the bundled books (downloaded only if missing) and saves `model.pt` in the architecture `Generate.py` expects.
 - `Tokenizer.py`: separate word-level tokenizer experiment.
