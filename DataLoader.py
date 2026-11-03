@@ -1,3 +1,4 @@
+import os
 import torch
 import urllib.request
 import tiktoken
@@ -13,11 +14,12 @@ books = {
 
 parts = []
 for filename, url in books.items():
-    try:
-        urllib.request.urlretrieve(url, filename)
-    except Exception as e:
-        print(f"skipped {filename}: {e}")
-        continue
+    if not os.path.exists(filename):
+        try:
+            urllib.request.urlretrieve(url, filename)
+        except Exception as e:
+            print(f"skipped {filename}: {e}")
+            continue
     with open(filename, "r", encoding="utf-8") as f:
         parts.append(f.read())
 

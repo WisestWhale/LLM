@@ -56,7 +56,7 @@ CPU-friendly model tests check output shape, feed-forward gradients, causal mask
 - `TransformerBlock.py`, `SelfAttention.py`, `FeedForward.py`, `LayerNorm.py`: model components.
 - `Generate.py`: checkpoint-based generation and command-line options.
 - `DataLoader.py`, `SlidingWindow.py`: text loading and next-token training windows.
-- `Training.py`: earlier training experiment; it currently expects a word-tokenizer interface while DataLoader uses tiktoken, so it needs alignment before use.
+- `Training.py`: trains the model on the bundled books (downloaded only if missing) and saves `model.pt` in the architecture `Generate.py` expects.
 - `Tokenizer.py`: separate word-level tokenizer experiment.
 
 ## Recent fixes
