@@ -10,6 +10,14 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
+## Train
+
+```powershell
+python train_small.py
+```
+
+Trains for 50 epochs on the four bundled books (90% train, 10% validation) and prints train and validation loss after each epoch. `model_small.pt` is overwritten only when validation loss improves, so the saved checkpoint is the best epoch, not the last. Every run starts from random weights, so copy the current `model_small.pt` first if you want to keep it. A CUDA GPU is used automatically when PyTorch can see one; on a CPU, 50 epochs is slow. The included `model_small.pt` was trained for 5 epochs.
+
 ## Generate text
 
 ```powershell

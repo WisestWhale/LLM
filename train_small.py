@@ -28,7 +28,7 @@ def get_loss(x, y):
 
 best_val = float("inf")
 
-for epoch in range(5):
+for epoch in range(50):
     model.train()
     for x, y in train_loader:
         optimizer.zero_grad()
