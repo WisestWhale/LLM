@@ -37,7 +37,10 @@ class MultiHeadAttention(nn.Module):
         ])
 
     def forward(self, x):
-        outputs = [head(x) for head in self.heads]
+        outputs = []
+        for head in self.heads:
+          result = head(x) 
+          outputs.append(result)
         return torch.cat(outputs, dim=-1)    
 
 if __name__ == "__main__":

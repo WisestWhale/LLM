@@ -40,7 +40,7 @@ def evaluate(model, token_ids, max_length, max_windows=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("text", type=Path, help="UTF-8 text file to score.")
-    parser.add_argument("--checkpoint", type=Path, default=Path(__file__).with_name("model.pt"))
+    parser.add_argument("--checkpoint", type=Path, default=Path(__file__).with_name("model_small.pt"))
     parser.add_argument("--max-windows", type=int,
                         help="Score only the first N windows of 128 tokens (faster on CPU).")
     args = parser.parse_args()

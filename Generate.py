@@ -60,7 +60,7 @@ def main():
     source = parser.add_mutually_exclusive_group()
     source.add_argument("--prompt", help="Starting text (default: The).")
     source.add_argument("--prompt-file", type=Path, help="Read starting text from a UTF-8 file.")
-    parser.add_argument("--checkpoint", type=Path, default=Path(__file__).with_name("model.pt"))
+    parser.add_argument("--checkpoint", type=Path, default=Path(__file__).with_name("model_small.pt"))
     parser.add_argument("--tokens", type=int, default=50)
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--top-k", type=int, default=20)
@@ -88,7 +88,10 @@ def main():
     import tiktoken
 
     torch.manual_seed(args.seed)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    if torch.cuda.is_available():
+      device = "cuda"
+    else:
+       device = "cpu"
     # Match the architecture used by the original Generate.py training script.
     model = GPT(vocab_size=50257, d_model=128, max_length=128, num_heads=4, num_blocks=4).to(device)
     try:
